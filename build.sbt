@@ -5,6 +5,6 @@ ThisBuild / scalaVersion := "2.13.8"
 lazy val root = (project in file("."))
   .settings(
     organization                             := "com.rewe-digital",
-    name                                     := "gcs-coursier",
+    name                                     := "gar-coursier",
     libraryDependencies += "com.google.cloud" % "google-cloud-storage" % "2.4.1",
   )
