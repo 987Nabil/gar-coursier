@@ -44,5 +44,5 @@ ThisBuild / githubWorkflowPublish := Seq(
 lazy val root = (project in file("."))
   .settings(
     name                                     := "gar-coursier",
-    libraryDependencies += "com.google.cloud" % "google-cloud-storage" % "2.4.1",
+    libraryDependencies += "com.google.cloud" % "google-cloud-storage" % "2.8.1",
   )
