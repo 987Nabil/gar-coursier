@@ -1,7 +1,6 @@
 inThisBuild(
   List(
     organization     := "io.github.987nabil",
-    version          := "0.1.0-SNAPSHOT",
     scalaVersion     := "2.13.8",
     organizationName := "Nabil Abdel-Hafeez",
     startYear        := Some(2022),
@@ -19,6 +18,8 @@ inThisBuild(
     sonatypeRepository     := "https://s01.oss.sonatype.org/service/local",
   )
 )
+
+Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 
