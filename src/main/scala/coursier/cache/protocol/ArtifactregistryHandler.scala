@@ -4,6 +4,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.http.{
   ByteArrayContent,
   GenericUrl,
+  HttpHeaders,
   HttpRequestFactory,
   HttpResponseException,
 }
@@ -45,10 +46,13 @@ class ArtifactregistryStreamHandler extends URLStreamHandler {
 class GcsArtifactRegistryUrlConnection(googleHttpRequestFactory: HttpRequestFactory, url: URL)
     extends HttpURLConnection(url) {
 
+  private var props: Map[String, String] = Map.empty
+
   override def connect(): Unit = {
     connected = false
     try {
-      connected = googleHttpRequestFactory.buildHeadRequest(genericUrl(url)).execute().isSuccessStatusCode
+      connected =
+        googleHttpRequestFactory.buildHeadRequest(genericUrl(url)).execute().isSuccessStatusCode
     } catch {
       case ex: HttpResponseException =>
         responseCode = ex.getStatusCode
@@ -69,6 +73,11 @@ class GcsArtifactRegistryUrlConnection(googleHttpRequestFactory: HttpRequestFact
         null
     }
 
+  override def setRequestProperty(key: String, value: String): Unit = {
+    if (!connected) props += key -> value
+    super.setRequestProperty(key, value)
+  }
+
   override def getOutputStream: OutputStream = {
     if (!connected) {
       connect()
@@ -77,10 +86,9 @@ class GcsArtifactRegistryUrlConnection(googleHttpRequestFactory: HttpRequestFact
       override def close(): Unit = {
         super.close()
         googleHttpRequestFactory
-          .buildPutRequest(
-            genericUrl(url),
-            new ByteArrayContent(getRequestProperty("Content-Type"), toByteArray),
+          .buildPutRequest(genericUrl(url), new ByteArrayContent(props.get("Content-Type").orNull, toByteArray),
           )
+          .setHeaders(props.foldLeft(new HttpHeaders()) { case (h, (k, v)) => h.set(k, v) })
           .execute()
       }
     }
